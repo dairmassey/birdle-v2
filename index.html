@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Birdle v2 Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Merriweather:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;500&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LIVE TOKENS — copied verbatim from :root on the dev build
+   (headless-preview-897 /games/birdle/, captured 2026-11-18)
+   ============================================================ */
+:root {
+  color-scheme: light;
+  --neutral-0:#fff; --neutral-100:#f7f7f7; --neutral-200:#f0f0f0; --neutral-300:#e5e5e5;
+  --neutral-400:#ccc; --neutral-500:#737373; --neutral-600:#606060; --neutral-700:#4e4e4e;
+  --neutral-800:#333; --neutral-900:#222; --neutral-1000:#000;
+  --green-500:#078a14; --yellow-500:#ffd100; --yellow-400:#ffe366; --red-500:#ff1700; --blue-700:#0059d8;
+  --color-text-headline:var(--neutral-900); --color-text-primary:var(--neutral-800);
+  --color-text-secondary:var(--neutral-700); --color-text-tertiary:var(--neutral-600);
+  --color-text-inverse:#fff;
+  --color-bg-surface:var(--neutral-0); --color-bg-very-light:var(--neutral-100);
+  --color-bg-light:var(--neutral-200); --color-bg-medium:var(--neutral-300); --color-bg-dark:var(--neutral-400);
+  --color-bg-cream:#f8f6ef; --color-bg-muted:#dedcd0;
+  --color-border-light:var(--neutral-300); --color-border-medium:var(--neutral-500); --color-border-dark:var(--neutral-900);
+  --color-platform:var(--yellow-500);
+  --radius-small:4px; --radius-medium:8px; --radius-large:12px; --radius-full:9999px;
+  --spacing:8px;
+  --spacing-super-tight:2px; --spacing-extra-tight:4px; --spacing-very-tight:6px; --spacing-tight:8px;
+  --spacing-base-tight:12px; --spacing-base:16px; --spacing-base-loose:24px; --spacing-loose:32px;
+  --font-body:"Merriweather",system-ui,sans-serif; --font-secondary:"Merriweather",system-ui,sans-serif;
+  --font-primary:"Plus Jakarta Sans",system-ui,sans-serif;
+  --font-headline:"Plus Jakarta Sans",system-ui,sans-serif; --font-utility:"Plus Jakarta Sans",system-ui,sans-serif;
+  --color-text-birdle:#1a1a1b; --color-black:#000;
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1);  /* Tailwind shadow-lg, already used by clue cards */
+  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1);  /* Tailwind shadow-xl, already used by dialogs */
+
+  /* ============================================================
+     NEW BIRDLE-ONLY TOKENS (no live equivalent). Namespaced "birdle" so
+     nobody mistakes them for global tokens. No global token is changed.
+     ============================================================ */
+  --color-birdle-correct:#a8d03a;      /* figma: right (also the Scientific Name card) */
+  --color-birdle-present:#f8c97c;      /* figma: close */
+  --color-birdle-button-hover:#54aad8; /* figma: sounds variable value */
+  --color-birdle-range:#ce58aa;
+  --color-birdle-habitat:#ffd99b;
+  --color-birdle-glimpse:#e24e40;
+  --color-birdle-photo:#e49f5f;
+  --font-birdle-label:"Space Mono",ui-monospace,monospace;   /* buttons, eyebrows, tiles, keys, wordmark */
+  --font-birdle-headline:"Instrument Serif",Georgia,serif;   /* headlines, body, credits */
+  --font-birdle-utility:"Space Grotesk",system-ui,sans-serif; /* small links, article cards */
+
+  /* doc chrome */
+  --doc-bg:#f4f4f2; --doc-ink:#1b1b1b; --doc-muted:#6b6b6b; --doc-line:#dcdcd6; --doc-card:#fff;
+  --doc-accent:#0059d8;
+  --font-doc:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{background:var(--doc-bg);color:var(--doc-ink);font:15px/1.55 var(--font-doc)}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
+code{background:#ecece7;border-radius:4px;padding:1px 5px;white-space:nowrap}
+a{color:var(--doc-accent)}
+.wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:32px;max-width:1240px;margin:0 auto;padding:32px 24px 80px}
+nav.toc{position:sticky;top:24px;align-self:start;font-size:14px}
+nav.toc b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--doc-muted);margin:0 0 8px}
+nav.toc a{display:block;color:var(--doc-ink);text-decoration:none;padding:5px 10px;border-radius:6px}
+nav.toc a:hover{background:#e7e7e2}
+header.doc h1{font:700 30px/1.2 var(--font-doc);margin:0 0 6px}
+header.doc p{margin:0 0 4px;color:var(--doc-muted)}
+.callout{background:#eaf6fd;border:1px solid #9fd2ef;border-radius:12px;padding:16px 18px;margin:20px 0 8px;display:flex;gap:16px;align-items:center}
+.callout .sw{flex:none;width:56px;height:56px;border-radius:12px;background:var(--color-bg-muted);border:1px solid #0001}
+.callout p{margin:0}
+section.screen{background:var(--doc-card);border:1px solid var(--doc-line);border-radius:16px;padding:24px;margin:24px 0;scroll-margin-top:16px}
+h3.sub{font:700 14px/1.3 var(--font-doc);margin:20px 0 8px}
+section.screen h2{font:700 21px/1.3 var(--font-doc);margin:0 0 2px}
+.node{color:var(--doc-muted);font-size:13px;margin:0 0 18px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.pane{border:1px solid var(--doc-line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.pane > .tag{font:600 11px/1 var(--font-doc);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--doc-line);background:#fafaf8;color:var(--doc-muted)}
+.pane > .tag.v2{color:#2a6f00}
+.stage{flex:1;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:200px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px;table-layout:fixed}
+td code{white-space:normal;overflow-wrap:anywhere}
+main{min-width:0}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--doc-line);vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--doc-muted);border-top:0}
+td:first-child{font-weight:600;width:22%}
+td del{color:#a33;text-decoration:none}
+.chip{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #0002;vertical-align:-1px;margin-right:4px}
+.tokens{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.tok{display:flex;gap:10px;align-items:center;border:1px solid var(--doc-line);border-radius:10px;padding:8px}
+.tok i{flex:none;width:36px;height:36px;border-radius:8px;border:1px solid #0002}
+.tok div{font-size:12px;line-height:1.35;min-width:0}
+.tok code{font-size:11px;white-space:normal;word-break:break-all}
+.note{font-size:13px;color:var(--doc-muted);margin:10px 0 0}
+.flag{background:#fff6e0;border:1px solid #f0d58a;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-top:12px}
+
+/* ---------------- MOCK PRIMITIVES ---------------- */
+.v1{font-family:var(--font-body);color:var(--color-text-headline)}
+/* v2 values of the two BIRDLE-ONLY live tokens. In the real code, change these in the theme
+   directly (only the Birdle game uses them). This doc sets them on .v2 only so its v1 mockups
+   can still show the old values. */
+.v2{
+  --color-bg-muted:#addcf5;     /* Birdle button fill (Play, Share). Was #dedcd0 */
+  --color-text-birdle:#171717;  /* Birdle ink. Was #1a1a1b */
+}
+.v2.stage{font-family:var(--font-birdle-headline);color:var(--color-text-birdle)}
+.v1.stage{background:var(--color-bg-cream)}
+.v2.stage{background:var(--color-bg-surface)}
+.label{font:700 12px/20px var(--font-birdle-label);text-transform:uppercase;letter-spacing:1.44px}
+.wm1{font:700 22px/30px var(--font-body);color:var(--color-text-headline)}
+.wm2{font:400 22px/1.54 var(--font-birdle-label);letter-spacing:-.88px;color:var(--color-text-birdle)}
+.wm2 em{font-style:italic}
+.bird{width:26px;height:26px;flex:none;display:block;object-fit:contain}
+.lucide{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.compare.three{grid-template-columns:repeat(3,1fr)}
+.v2 .tile.act{border-color:var(--color-border-dark)} /* every tile in the current row gets the dark outline */
+.key{cursor:pointer}
+.v1 .key:hover,.v2 .key:hover{filter:brightness(.95)}
+
+/* buttons */
+.btn1{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 16px;border-radius:var(--radius-full);background:var(--color-text-headline);color:var(--color-text-inverse);font:600 14px/20px var(--font-secondary);box-shadow:0 1px 3px #0000001a,0 1px 2px -1px #0000001a;border:0}
+.btn1.muted{background:var(--color-bg-muted);color:var(--color-text-primary);font-weight:700}
+.btn1.black{background:#000}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;min-width:132px;padding:0 12px;border-radius:var(--radius-full);background:var(--color-bg-muted);color:var(--color-text-birdle);font:700 12px/20px var(--font-birdle-label);text-transform:uppercase;letter-spacing:1.44px;border:0}
+.btn2.wide,.btn1.wide{width:100%}
+.btn2,.play2{cursor:pointer;transition:background-color .15s cubic-bezier(.4,0,.2,1)}
+.btn2:hover,.play2:hover,.btn2.is-hover{background:var(--color-birdle-button-hover)}
+.btn2:focus-visible,.play2:focus-visible{outline:2px solid var(--color-text-birdle);outline-offset:2px}
+.play1{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--radius-small);background:var(--color-bg-muted);font:700 13px/20px var(--font-body);color:#000}
+.play2{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:6px 16px;border-radius:var(--radius-small);background:var(--color-bg-muted);font:700 11px/20px var(--font-birdle-label);text-transform:uppercase;color:var(--color-text-birdle);width:100%}
+.tri{width:0;height:0;border:5px solid transparent;border-left:8px solid currentColor;border-right:0}
+
+/* tiles */
+.board{display:grid;grid-template-columns:repeat(6,26px);gap:2px}
+.tile{width:26px;height:26px;display:grid;place-items:center;border-radius:2px;border:1px solid var(--color-border-light);background:var(--color-bg-surface);text-transform:uppercase;font-size:13px}
+.v1 .tile{font-family:var(--font-body);font-weight:700}
+.v2 .tile{font-family:var(--font-birdle-label);font-weight:700;color:var(--color-text-birdle)}
+.v1 .tile.c{background:var(--green-500);border-color:var(--green-500);color:var(--color-text-inverse)}
+.v1 .tile.p{background:var(--yellow-500);border-color:var(--yellow-500);color:var(--color-text-headline)}
+.v1 .tile.a{background:var(--color-bg-medium);border-color:var(--color-bg-medium)}
+.v1 .tile.f{border-color:#000;color:#000}
+.v2 .tile.c{background:var(--color-birdle-correct);border-color:transparent}
+.v2 .tile.p{background:var(--color-birdle-present);border-color:transparent}
+.v2 .tile.a{background:var(--color-bg-medium);border-color:transparent}
+.v2 .tile.f{border-color:var(--color-border-dark)}
+
+/* keyboard */
+.kb{display:flex;flex-direction:column;gap:4px;width:100%;max-width:330px}
+.kb .row{display:flex;gap:2px;justify-content:center}
+.key{flex:1 1 0;max-width:30px;height:36px;display:grid;place-items:center;border-radius:var(--radius-small);border:1px solid var(--color-border-light);background:var(--color-bg-surface);font-size:13px;text-transform:uppercase}
+.key.wide{max-width:46px;font-size:8px}
+.v1 .key{font-family:var(--font-body);font-weight:700;color:#000}
+.v2 .key{font-family:var(--font-birdle-label);font-weight:700;color:var(--color-text-birdle)}
+.v1 .key.c{background:var(--green-500);color:#fff;border-color:var(--green-500)}
+.v1 .key.p{background:var(--yellow-500);border-color:var(--yellow-500)}
+.v1 .key.a{background:var(--color-bg-medium)}
+.v2 .key.c{background:var(--color-birdle-correct);border-color:transparent}
+.v2 .key.p{background:var(--color-birdle-present);border-color:transparent}
+.v2 .key.a{background:var(--color-bg-medium)}
+.v2 .key.w{background:var(--color-bg-medium);border-color:transparent} /* lost state: every letter key wrong, no border */
+
+/* clue tray */
+.tray{width:100%;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.v1 .tray{background:var(--color-bg-muted)}
+.v2 .tray{background:var(--color-bg-cream);border-top:1px solid var(--color-black);border-bottom:1px solid var(--color-black)}
+.cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;width:100%}
+.card{aspect-ratio:9/10;border-radius:8px;background:#fff;box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;padding:5px;min-width:0}
+.v1 .card{font:700 8.5px/1.2 var(--font-body);color:#000;background:#fff repeating-linear-gradient(45deg,#0000 0 6px,#f1efe7 6px 7px)}
+.v1 .card.open{background:#fff}
+.v2 .card{border:1px solid #000;align-items:center;justify-content:space-between;padding:7px 3px;text-align:center}
+.v2 .card .label{font-size:6.5px;line-height:1.2;letter-spacing:.6px}
+.v2 .card.open{align-items:stretch;justify-content:flex-start;text-align:left;gap:4px}
+.v2 .card svg{width:18px;height:14px}
+.mini-play{height:11px;border-radius:2px;margin-top:3px}
+.v1 .mini-play{background:var(--color-bg-muted)}
+.v2 .mini-play{background:var(--color-bg-muted)}
+.prog{display:flex;align-items:center;gap:2px}
+.dot{width:12px;height:12px;border-radius:50%;background:#fff;border:1px solid #000}
+.dot.done{background:#fff radial-gradient(circle,#000 0 2px,#0000 2.5px)}
+.v1 .prog span{font:400 10px/1 var(--font-body);margin-left:6px}
+.v2 .prog span{font:700 10px/1 var(--font-birdle-label);margin-left:6px}
+
+/* misc mock bits */
+.hdr{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px}
+.hdr .sp{flex:1}
+.v1 .hdr{background:var(--color-bg-cream)}
+.v2 .hdr{background:var(--color-bg-cream)} /* shared site header: unchanged */
+.pill-o,.pill-y{white-space:nowrap;flex:none}
+.pill-o{border:1px solid #000;border-radius:999px;padding:3px 10px;font:600 11px/1 var(--font-primary)}
+.pill-y{background:var(--color-platform);border-radius:999px;padding:4px 10px;font:700 11px/1 var(--font-primary)}
+.ico{width:16px;height:16px;border:1.5px solid #222;border-radius:50%;display:grid;place-items:center;font:700 10px/1 system-ui}
+.stat{flex:1;text-align:center;padding:8px 4px;border-radius:4px}
+.v1 .stat{background:var(--color-bg-surface)}
+.v1 .stat b{display:block;font:900 18px/1.2 var(--font-body)}
+.v1 .stat small{font:400 10px/1 var(--font-body);color:var(--color-text-secondary)}
+.v2 .stat{background:linear-gradient(#fff,#ececec)}
+.v2 .stat b{display:block;font:400 18px/1.3 var(--font-birdle-label)}
+.v2 .stat small{font:700 8px/1 var(--font-birdle-label);text-transform:uppercase;letter-spacing:1px}
+.stats{display:flex;gap:6px;width:100%;max-width:300px}
+.photo{width:100%;max-width:260px;aspect-ratio:4/3;border-radius:10px;background:linear-gradient(160deg,#dfe7ee,#98a7b4 55%,#5b4a3a)}
+.modalbg{width:100%;align-self:stretch;flex:1;display:grid;place-items:center;padding:16px}
+.v1 .modalbg{background:var(--color-bg-cream);backdrop-filter:blur(20px)}
+.v2 .modalbg{background:rgba(0,0,0,.5)}
+.modal{width:100%;max-width:260px;padding:10px;border-radius:12px;background:#fff;box-shadow:var(--shadow-xl)}
+.modal .mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.x{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:400 14px/1 system-ui}
+.v1 .x{background:var(--color-bg-muted)}
+.v2 .x{background:var(--color-bg-medium)}
+.credit1{font:400 9px/14px var(--font-body);color:var(--color-text-primary)}
+.credit2{font:italic 400 10px/16px var(--font-birdle-headline);color:var(--color-text-primary)}
+.hab{width:96px;border:1px solid #000;border-radius:8px;background:#fff;padding:5px;box-shadow:var(--shadow-lg)}
+.hab .art{height:52px;border-radius:4px;background:var(--color-bg-cream);margin:4px 0;display:grid;place-items:center;font-size:22px}
+.hab .nm{font:400 13px/1.2 var(--font-birdle-headline)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
+.art-card{border:1px solid #000;border-radius:8px;overflow:hidden;background:#fff}
+.art-card .im{aspect-ratio:3/2;background:var(--color-bg-medium)}
+.art-card p{margin:0;padding:5px;font:500 9px/1.3 var(--font-birdle-utility)}
+.art-card1{border-radius:8px;overflow:hidden;background:#fff}
+.art-card1 .im{aspect-ratio:3/2;background:var(--color-bg-medium)}
+.art-card1 p{margin:0;padding:5px;font:700 9px/1.3 var(--font-body)}
+.lead{text-align:center}
+.lead small{display:block}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;padding:20px 16px 64px}
+  nav.toc{position:static;display:flex;flex-wrap:wrap;gap:4px}
+  nav.toc b{width:100%}
+  .compare{grid-template-columns:1fr}
+  table{display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc">
+  <b>Screens</b>
+  <a href="#tokens">0 · Token map</a>
+  <a href="#header">1 · Header</a>
+  <a href="#welcome">2 · Welcome</a>
+  <a href="#tray">3 · Clue tray</a>
+  <a href="#board">4 · Board &amp; keyboard</a>
+  <a href="#modal">5 · Glimpse / Photo modal</a>
+  <a href="#end">6 · End of game</a>
+  <a href="#stats">7 · Statistics</a>
+  <a href="#bird">8 · Bird detail</a>
+  <a href="#habitat">9 · Habitat cards</a>
+  <a href="#a11y">Accessibility</a>
+</nav>
+
+<main>
+<header class="doc">
+  <h1>Birdle v1 → v2 handoff</h1>
+  <p><b>Live (v1):</b> dev build <code>headless-preview-897 /games/birdle/</code>. Token names on the left of each table are copied from that page's <code>:root</code> and from the Birdle component class strings.</p>
+  <p><b>Design (v2):</b> Figma "Birdle" → page "v1&amp;v2", section <code>735:47256</code>. All mockups below render with the CSS variables defined in this file.</p>
+  <div class="callout v2">
+    <span class="sw" aria-hidden="true"></span>
+    <span class="sw" aria-hidden="true" style="background:var(--color-birdle-button-hover)"></span>
+    <p><b>v2 button: default <code>#addcf5</code> → hover <code>#54aad8</code></b>. The default reuses Birdle's own button color, <code>--color-bg-muted</code>. Play call and Share results already use it, and only Birdle uses this token, so its value changes from #dedcd0 to #addcf5. Hover is new: <code>--color-birdle-button-hover</code>. <b>No global token changes.</b></p>
+  </div>
+</header>
+
+<!-- 0 TOKENS -->
+<section class="screen" id="tokens">
+  <h2>0 · Token map</h2>
+  <p class="node"><b>Rule: no global token changes value.</b> Global tokens are reused exactly as they are, and only by swapping classes. The only values that change belong to the two tokens that just the Birdle game uses. Everything else is a new <code>--color-birdle-*</code> / <code>--font-birdle-*</code> token.</p>
+
+  <h3 class="sub">A · Global tokens reused as-is: just swap the class, values untouched</h3>
+  <table>
+    <tr><th>v2 need</th><th>v2 value</th><th>Live token to use</th></tr>
+    <tr><td>Page and keyboard bg</td><td>#ffffff</td><td><code>--color-bg-surface</code>: swap <code>bg-bg-cream</code> → <code>bg-bg-surface</code> on the game wrapper and keyboard footer. The <b>site header keeps <code>bg-bg-cream</code></b>, because it's the shared Outside header</td></tr>
+    <tr><td>Clue tray bg</td><td>#f8f5ee</td><td><code>--color-bg-cream</code> (#f8f6ef, a 1-step difference you can't see; Figma's own <code>background</code> variable is #f8f6ef): swap <code>bg-bg-muted</code> → <code>bg-bg-cream</code></td></tr>
+    <tr><td>Absent tile/key ("wrong")</td><td>#e6e6e6</td><td><code>--color-bg-medium</code> (#e5e5e5). Already used for <code>absent</code>, so no change</td></tr>
+    <tr><td>Empty tile/key border</td><td>#e5e5e5</td><td><code>--color-border-light</code>. No change</td></tr>
+    <tr><td>Active-row outline</td><td>#222</td><td><code>--color-border-dark</code></td></tr>
+    <tr><td>Card, tray and progress-dot borders</td><td>#000 / #171717</td><td><b>Static black</b>: <code>border-black</code> (<code>--color-black</code>, Figma <code>color/static/black</code>). Already on the progress dots</td></tr>
+    <tr><td>Modal scrim</td><td>#00000080</td><td><code>bg-black/50</code>, the default <code>DialogOverlay</code>. Delete the Glimpse <code>overlayClassName</code> override</td></tr>
+    <tr><td>Modal close button</td><td>#e5e5e5</td><td><code>--color-bg-medium</code>: swap <code>bg-bg-muted</code> → <code>bg-bg-medium</code></td></tr>
+    <tr><td>Text greys</td><td>#333 / #4e4e4e</td><td><code>--color-text-primary</code> / <code>--color-text-secondary</code></td></tr>
+    <tr><td>Card / dialog shadows</td><td>0 10 15 −3 / 0 20 25 −5</td><td><code>shadow-lg</code> / <code>shadow-xl</code> (already in the code as arbitrary values; switch to the named utilities)</td></tr>
+    <tr><td>Radii</td><td>2 / 4 / 8 / 12 / full</td><td><code>rounded-[2px]</code> (tiles, unchanged), <code>--radius-small</code>, <code>--radius-medium</code>, <code>--radius-large</code>, <code>--radius-full</code></td></tr>
+    <tr><td>Type sizes</td><td>32/40 · 24 · 20 · 18 · 18/28 · 12/18 · 10/16</td><td><code>--h1-size</code>/<code>--h1-line-height</code> (desktop 32/40) · <code>--h3-size</code> (24) · <code>--h4-size</code> (20) · <code>--h5-size</code> (18) · <code>text-lg</code> (18/28) · <code>--text-utility3-size</code>/<code>--leading-utility3-line-height</code> (12/18) · <code>--text-utility4-size</code>/<code>--leading-utility4-line-height</code> (10/16). Label = utility3 size + <code>--leading-utility2-line-height</code> (12/20)</td></tr>
+    <tr><td>Spacing</td><td>2–32</td><td><code>--spacing-super-tight</code> … <code>--spacing-loose</code>. No change</td></tr>
+  </table>
+
+  <h3 class="sub">B · Birdle-only tokens: change the value</h3>
+  <p class="note" style="margin:0 0 8px">These two are used only in the Birdle game code: no other Outside page, and not the site header. Changing their values in the theme affects Birdle alone.</p>
+  <table>
+    <tr><th>Birdle token</th><th>Live value</th><th>v2 value</th><th>What it drives</th></tr>
+    <tr><td><code>--color-bg-muted</code></td><td><span class="chip" style="background:#dedcd0"></span>#dedcd0</td><td class="v2"><span class="chip" style="background:var(--color-bg-muted)"></span>#addcf5</td><td>Birdle's button fill. Play call and Share results already use it. Also point Play Birdle, Sign up and Learn more at <code>bg-bg-muted</code>, with hover <code>bg-birdle-button-hover</code>. The tray and close button move off it (see A)</td></tr>
+    <tr><td><code>--color-text-birdle</code></td><td><span class="chip" style="background:#1a1a1b"></span>#1a1a1b</td><td><span class="chip" style="background:#171717"></span>#171717</td><td>Birdle ink: tile and key letters, labels, button text</td></tr>
+  </table>
+  <p class="note">Not changed: <code>--color-platform</code> (site Join Now and nav), <code>--color-bg-cream</code> (site header in Birdle mode), and the global font tokens <code>--font-body</code>, <code>--font-secondary</code>, <code>--font-headline</code> and <code>--font-utility</code>. The <code>birdleButtonClasses.primary</code> variant (<code>bg-platform</code>) is left alone. Birdle CTAs use the muted variant instead.</p>
+
+  <h3 class="sub">C · New Birdle tokens: no live equivalent</h3>
+  <div class="tokens">
+    <div class="tok"><i style="background:var(--color-birdle-correct)"></i><div><code>--color-birdle-correct</code><br>#a8d03a · correct tile/key + Scientific Name card. Live uses global <code>--green-500</code></div></div>
+    <div class="tok"><i style="background:var(--color-birdle-present)"></i><div><code>--color-birdle-present</code><br>#f8c97c · present tile/key. Live uses global <code>--yellow-500</code></div></div>
+    <div class="tok"><i style="background:var(--color-birdle-button-hover)"></i><div><code>--color-birdle-button-hover</code><br>#54aad8 · button hover. Live uses primitive <code>hover:bg-yellow-400</code></div></div>
+    <div class="tok"><i style="background:var(--color-birdle-range)"></i><div><code>--color-birdle-range</code><br>#ce58aa</div></div>
+    <div class="tok"><i style="background:var(--color-birdle-habitat)"></i><div><code>--color-birdle-habitat</code><br>#ffd99b</div></div>
+    <div class="tok"><i style="background:var(--color-birdle-glimpse)"></i><div><code>--color-birdle-glimpse</code><br>#e24e40</div></div>
+    <div class="tok"><i style="background:var(--color-birdle-photo)"></i><div><code>--color-birdle-photo</code><br>#e49f5f</div></div>
+  </div>
+  <table style="margin-top:12px">
+    <tr><th>New font token</th><th>Face</th><th>Used for</th></tr>
+    <tr><td><code>--font-birdle-label</code></td><td><span class="label">Space Mono</span> 400 / 400 italic / 700</td><td>Buttons, eyebrows, tiles, keys, card titles, stat numbers, wordmark</td></tr>
+    <tr><td><code>--font-birdle-headline</code></td><td><span style="font:400 18px var(--font-birdle-headline)">Instrument Serif</span> 400 / 400 italic</td><td>Headlines, body copy, credits, habitat names</td></tr>
+    <tr><td><code>--font-birdle-utility</code></td><td><span style="font:400 14px var(--font-birdle-utility)">Space Grotesk</span> 400 / 500</td><td>Welcome nav links, article cards, bird facts</td></tr>
+  </table>
+  <p class="note">The global font tokens can't be re-valued because the whole site uses them, so these three are new. The correct and present names follow the tile variant keys already in the code (<code>correct</code> / <code>present</code> / <code>absent</code>). <code>absent</code> keeps the global <code>--color-bg-medium</code>. Label letter-spacing (1.44px / 0.12em) goes in one <code>@utility text-label</code>, not a token. All three fonts are Google Fonts (OFL). Self-host them with <code>next/font</code> on Birdle routes only.</p>
+</section>
+
+<!-- 1 HEADER -->
+<section class="screen" id="header">
+  <h2>1 · Header</h2>
+  <p class="node">Figma <code>735:49633</code></p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1" style="min-height:90px;padding:0;justify-content:center">
+      <div class="hdr"><span>☰</span><img class="bird" src="birdle-logo.svg" alt=""><span class="wm1">Birdle</span><span class="sp"></span><span class="pill-o">Sign In</span><span class="pill-y">Join Now</span></div>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2" style="min-height:90px;padding:0;justify-content:center">
+      <div class="hdr"><span>☰</span><img class="bird" src="birdle-logo.svg" alt=""><span class="wm2">B<em>i</em>rdle</span><span class="sp"></span><span class="ico">?</span><svg class="lucide" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg><span class="pill-o">Sign In</span><span class="pill-y">Join Now</span></div>
+    </div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Background</td><td><code>--color-bg-cream</code> #f8f6ef</td><td>No change. Keep <code>bg-bg-cream</code> (this is the shared Outside site header)</td></tr>
+    <tr><td>Wordmark</td><td><code>--font-body</code> 24px/32px w700 <code>--color-text-headline</code></td><td><code>--font-birdle-label</code> 400 24px/1.54, <code>letter-spacing:-0.96px</code>, only the "i" italic, #171717</td></tr>
+    <tr><td>Right side</td><td>Sign In (outline) + Join Now (<code>--color-platform</code>)</td><td><b>Sign In + Join Now stay exactly as live.</b> Add the Help (?) 22px icon and the Stats icon (Lucide <code>chart-no-axes-column</code>) before them, gap <code>--spacing-base</code></td></tr>
+  </table>
+</section>
+
+<!-- 2 WELCOME -->
+<section class="screen" id="welcome">
+  <h2>2 · Welcome</h2>
+  <p class="node">Figma <code>735:50056</code> (desktop) · <code>735:50087</code> (mobile)</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1 lead">
+      <img class="bird" src="birdle-logo.svg" alt="" style="width:40px;height:40px">
+      <div style="font:800 26px/1.2 var(--font-secondary)">Birdle</div>
+      <div style="font:600 11px/18px var(--font-secondary);letter-spacing:.36px;text-transform:uppercase;color:var(--color-text-secondary)">A daily bird game</div>
+      <div style="font:700 16px/24px var(--font-body);color:var(--color-text-primary)">Six guesses to identify the bird.</div>
+      <div style="font:400 12px/18px var(--font-secondary);color:var(--color-text-secondary);max-width:280px">Each wrong guess unlocks a new clue. Its call, its song, where it lives, and finally a photo.</div>
+      <button class="btn1">Play Birdle</button>
+      <div style="display:flex;gap:16px;font:400 11px var(--font-secondary);color:var(--color-text-secondary)"><span>Tutorial</span><span>Stats</span><span>FAQ</span><span>Articles</span></div>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2 lead">
+      <img class="bird" src="birdle-logo.svg" alt="" style="width:40px;height:40px">
+      <div class="wm2" style="font-size:24px">B<em>i</em>rdle</div>
+      <div class="label" style="color:var(--color-text-secondary)">A daily bird game</div>
+      <div style="font:400 28px/36px var(--font-birdle-headline);color:var(--color-text-primary)">Six guesses to identify the bird.</div>
+      <div style="font:400 16px/24px var(--font-birdle-headline);color:var(--color-text-secondary);max-width:300px">Each wrong guess unlocks a new clue. Its call, its song, where it lives, and finally a photo.</div>
+      <button class="btn2">Play Birdle</button>
+      <div style="display:flex;gap:24px;align-items:center;font:400 12px/18px var(--font-birdle-utility);color:var(--color-text-secondary)"><span>Tutorial</span><span>Stats</span><span>FAQ</span><span>Articles</span></div>
+    </div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Page bg</td><td><code>--color-bg-cream</code></td><td><code>--color-bg-surface</code></td></tr>
+    <tr><td>"Birdle"</td><td><code>--font-secondary</code> 32/40 w800 <code>--color-text-headline</code></td><td>Same as the header wordmark: <code>--font-birdle-label</code> 400 24px, italic "i"</td></tr>
+    <tr><td>Eyebrow</td><td><code>--font-secondary</code> 12/18 w600, ls .36px, <code>--color-text-secondary</code></td><td>Label style, <code>--color-text-secondary</code></td></tr>
+    <tr><td>Headline</td><td><code>--font-body</code> 18/26 bold, <code>--color-text-primary</code></td><td><code>--font-birdle-headline</code> 32px/40px, <code>--color-text-primary</code></td></tr>
+    <tr><td>Sub copy</td><td><code>--font-secondary</code> 14/20, <code>--color-text-secondary</code></td><td><code>--font-birdle-headline</code> 18px/28px, <code>--color-text-secondary</code>, width 512px</td></tr>
+    <tr><td>CTA</td><td><code>birdleButtonClasses.dark</code>: <code>bg-text-headline</code> #222, white, 14px semibold, shadow</td><td><code>--color-bg-muted</code> #addcf5, hover <code>--color-birdle-button-hover</code> #54aad8, h 40, min-w 132, px 12, label style #171717, no shadow</td></tr>
+    <tr><td>CTA states</td><td><code>hover:bg-text-secondary</code></td><td><span class="btn2 v2" style="height:32px;min-width:0">Default</span> <span class="btn2 is-hover v2" style="height:32px;min-width:0">Hover</span> Keep the text #171717 on hover. #171717 on #54aad8 is about 7.4:1.</td></tr>
+    <tr><td>Nav</td><td>Merriweather 12/18. Tutorial · Stats · FAQ · Articles</td><td><code>--font-birdle-utility</code> 12/18, gap <code>--spacing-base-loose</code>. Tutorial · Stats · FAQ · Articles, all plain text links.</td></tr>
+  </table>
+</section>
+
+<!-- 3 TRAY -->
+<section class="screen" id="tray">
+  <h2>3 · Clue tray</h2>
+  <p class="node">Figma <code>735:49662</code>. Cards are 180×200 at desktop size.</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1" style="padding:0">
+      <div class="tray">
+        <div class="cards">
+          <div class="card open">Sounds<div class="mini-play"></div><div class="mini-play"></div></div>
+          <div class="card">Range</div><div class="card">Habitat</div><div class="card">Glimpse</div><div class="card">Photo</div><div class="card">Scientific Name</div>
+        </div>
+        <div class="prog"><i class="dot done"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>1 of 6 clues</span></div>
+      </div>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2" style="padding:0">
+      <div class="tray">
+        <div class="cards">
+          <div class="card open"><span class="label">Sounds</span><div class="mini-play"></div><div class="mini-play"></div></div>
+          <div class="card" style="background:var(--color-birdle-range)"><span class="label">Range</span><svg viewBox="0 0 20 14"><ellipse cx="10" cy="7" rx="9" ry="6" fill="#000"/><path d="M1 7h18M10 1v12M4 3.5h12M4 10.5h12" stroke="#ce58aa" stroke-width="1"/></svg><span class="label">02</span></div>
+          <div class="card" style="background:var(--color-birdle-habitat)"><span class="label">Habitat</span><svg viewBox="0 0 20 14"><path d="M3 14 5 3l2 11M8 14l2-13 2 13M13 14l2-10 2 10" fill="#000"/></svg><span class="label">03</span></div>
+          <div class="card" style="background:var(--color-birdle-glimpse)"><span class="label">Glimpse</span><svg viewBox="0 0 20 14"><rect x="2" y="2" width="6" height="11" rx="2"/><rect x="12" y="2" width="6" height="11" rx="2"/><rect x="7" y="5" width="6" height="3"/></svg><span class="label">04</span></div>
+          <div class="card" style="background:var(--color-birdle-photo)"><span class="label">Photo</span><svg viewBox="0 0 20 14"><rect x="1" y="3" width="18" height="11" rx="2"/><rect x="7" y="0" width="6" height="4"/><circle cx="10" cy="8.5" r="3" fill="#e49f5f"/></svg><span class="label">05</span></div>
+          <div class="card" style="background:var(--color-birdle-correct)"><span class="label">Scientific Name</span><svg viewBox="0 0 20 14"><path d="M0 5c4-1 7 0 10 3 3-3 6-4 10-3-4 1-6 3-8 5l-2 4-2-4C6 8 4 6 0 5z"/></svg><span class="label">06</span></div>
+        </div>
+        <div class="prog"><i class="dot done"></i><i class="dot done"></i><i class="dot done"></i><i class="dot done"></i><i class="dot" style="background:radial-gradient(circle,#000 0 3px,#fff 3.5px)"></i><i class="dot"></i><span>5 of 6 clues</span></div>
+      </div>
+    </div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Tray bg</td><td><code>bg-bg-muted</code> → <code>--color-bg-muted</code> #dedcd0</td><td><code>bg-bg-cream</code> (existing <code>--color-bg-cream</code>) + <code>border-y border-black</code></td></tr>
+    <tr><td>Card shell</td><td><code>rounded-large bg-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]</code></td><td>Same, plus <b><code>border:1px solid #000</code></b></td></tr>
+    <tr><td>Locked face</td><td>White with a pattern, title only</td><td>Solid fill per clue: <code>--color-birdle-range</code> / <code>-habitat</code> / <code>-glimpse</code> / <code>-photo</code> / <code>-right</code>. Column layout, <code>justify-between</code>, padding 20px 10px: label → 40×30 icon → "02"–"06"</td></tr>
+    <tr><td>Card title</td><td><code>font-body text-utility-size font-bold</code> (Merriweather 16px)</td><td>Label style, black</td></tr>
+    <tr><td>Sounds Play</td><td><code>rounded-small bg-bg-muted</code>, Merriweather 14 bold</td><td><code>--color-bg-muted</code>, <code>--radius-small</code>, padding 6/16, play icon 20px + label</td></tr>
+    <tr><td>Credit</td><td>Merriweather 10/16, <code>--color-text-primary</code></td><td><code>--font-birdle-headline</code> italic 10/16, <code>--color-text-primary</code></td></tr>
+    <tr><td>Progress text</td><td>Merriweather 12/18</td><td><code>--font-birdle-label</code> 700 12/18, #171717. Dots 18px, 1px #171717, gap <code>--spacing-super-tight</code></td></tr>
+  </table>
+</section>
+
+<!-- 4 BOARD -->
+<section class="screen" id="board">
+  <h2>4 · Board &amp; keyboard</h2>
+  <p class="node">Figma <code>735:49746</code> (board + keyboard) · <code>735:49956</code> (key state reference). Hover over the v2 keys to see the hover state.</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1">
+      <div class="board" data-rows="sacpca;BALD__"></div>
+      <div class="kb" data-kb="v1"></div>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2">
+      <div class="board" data-rows="sacpca;BALD__"></div>
+      <div class="kb" data-kb="v2"></div>
+    </div></div>
+  </div>
+  <div class="compare three">
+    <div class="pane"><div class="tag v2">v2 key state · right (was green)</div><div class="stage v2" style="min-height:130px"><div class="kb" data-kb="all-c"></div></div></div>
+    <div class="pane"><div class="tag v2">v2 key state · close (was yellow)</div><div class="stage v2" style="min-height:130px"><div class="kb" data-kb="all-p"></div></div></div>
+    <div class="pane"><div class="tag v2">v2 key state · wrong (was gray)</div><div class="stage v2" style="min-height:130px"><div class="kb" data-kb="all-w"></div></div></div>
+  </div>
+  <table>
+    <tr><th>Variant</th><th>Live class string</th><th>v2 token / value</th></tr>
+    <tr><td>Tile correct</td><td><code>bg-green-500 border-green-500 text-text-inverse</code></td><td><code>--color-birdle-correct</code>, text #171717, no border</td></tr>
+    <tr><td>Tile present</td><td><code>bg-yellow-500 border-yellow-500 text-text-headline</code></td><td><code>--color-birdle-present</code>, text #171717</td></tr>
+    <tr><td>Tile absent</td><td><code>bg-bg-medium border-bg-medium</code></td><td>No change. Keep <code>bg-bg-medium</code></td></tr>
+    <tr><td>Tile empty</td><td><code>bg-bg-surface border-border-light</code></td><td>No change</td></tr>
+    <tr><td>Tile filled</td><td><code>bg-bg-surface border-black text-black</code></td><td><code>border-color: var(--color-border-dark)</code> (#222)</td></tr>
+    <tr><td>Active row <b>(new)</b></td><td>Only <i>filled</i> tiles get <code>border-black</code>. Empty tiles in the current row stay <code>border-border-light</code></td><td><b>Every tile in the current row</b>, filled or empty, gets <code>1px solid var(--color-border-dark)</code>. That gives the whole row a black outline. Add an <code>active</code> variant (white bg, #222 border) for empty tiles in the current row. Figma <code>735:49748</code>, row 2</td></tr>
+    <tr><td>Tile font</td><td><code>font-body font-bold uppercase</code></td><td><code>--font-birdle-label</code> 700 18px/14px. Typing row 16px/16px</td></tr>
+    <tr><td>Key base</td><td><code>h-7.25 rounded-small border-border-light bg-bg-surface font-body text-(length:--h4-size) font-bold text-black</code></td><td>Same box. <code>--font-birdle-label</code> 700 20px/23px uppercase #171717. ENTER 12px</td></tr>
+    <tr><td>Key correct</td><td><code>bg-green-500 text-white</code></td><td><code>--color-birdle-correct</code>, black text</td></tr>
+    <tr><td>Key present</td><td><code>bg-yellow-500 text-black</code></td><td><code>--color-birdle-present</code></td></tr>
+    <tr><td>Key absent</td><td><code>bg-bg-medium</code></td><td>No change. Keep <code>bg-bg-medium</code> + 1px <code>--color-border-light</code></td></tr>
+    <tr><td>Key hover</td><td><code>hover:bg-bg-surface hover:brightness-95</code> (colored keys use <code>hover:bg-green-500</code> / <code>hover:bg-yellow-500</code> / <code>hover:bg-bg-medium</code> so the color holds)</td><td>Same behavior on the new colors: keep each state's bg on hover and apply <code>filter: brightness(.95)</code> (same as live)</td></tr>
+    <tr><td>Key state reference</td><td>green / yellow / gray</td><td><code>735:49956</code> shows each state on a full keyboard: right <code>#a8d03a</code>, close <code>#f8c97c</code> (replaces v1 yellow), wrong <code>#e6e6e6</code>. These are state references, <b>not</b> win/lose screens. ENTER and ⌫ never change color</td></tr>
+    <tr><td>Footer bg</td><td><code>bg-bg-cream</code> (sticky keyboard)</td><td><code>--color-bg-surface</code></td></tr>
+  </table>
+</section>
+
+<!-- 5 MODAL -->
+<section class="screen" id="modal">
+  <h2>5 · Glimpse / Photo modal</h2>
+  <p class="node">Figma <code>735:50258</code> (desktop) · <code>735:50269</code> (mobile)</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1" style="padding:0"><div class="modalbg">
+      <div class="modal"><div class="mh"><b style="font:900 18px var(--font-body)">Glimpse</b><span class="x">×</span></div><div class="photo"></div><div class="credit1">Photo by Andy Morffew · CC BY 2.0 · Wikimedia</div></div>
+    </div></div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2" style="padding:0"><div class="modalbg">
+      <div class="modal"><div class="mh"><span style="font:400 22px var(--font-birdle-headline)">Glimpse</span><span class="x">×</span></div><div class="photo"></div><div class="credit2">Photo by Andy Morffew · <u>CC BY 2.0</u> · <u>Wikimedia</u></div></div>
+    </div></div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Overlay</td><td><code>overlayClassName: "bg-bg-cream backdrop-blur-[20px]"</code></td><td><code>bg-black/50</code>, the default <code>DialogOverlay</code>. Delete the <code>overlayClassName</code> override. No blur</td></tr>
+    <tr><td>Panel</td><td><code>rounded-large bg-bg-surface shadow-[0_20px_25px_-5px]</code></td><td>Same radius and shadow (<code>--shadow-xl</code>), padding <code>--spacing-base-tight</code></td></tr>
+    <tr><td>Title</td><td>Merriweather bold</td><td><code>--font-birdle-headline</code> ~24px</td></tr>
+    <tr><td>Close</td><td><code>rounded-full bg-bg-muted</code></td><td><code>--color-bg-medium</code> circle</td></tr>
+    <tr><td>Credit</td><td>Merriweather 10px</td><td><code>--font-birdle-headline</code> italic 10/16</td></tr>
+  </table>
+</section>
+
+<!-- 6 END -->
+<section class="screen" id="end">
+  <h2>6 · End of game</h2>
+  <p class="node">Figma <code>735:50422</code> (inline + Keep Birding) · <code>735:50280</code> (overlay panel). Live values here come from the bundle's class strings, not a rendered page.</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1 lead">
+      <img class="bird" src="birdle-logo.svg" alt="" style="width:30px;height:30px">
+      <div style="font:900 22px var(--font-body)">Congratulations!</div>
+      <div class="stats"><div class="stat"><b>1</b><small>Streak</small></div><div class="stat"><b>1</b><small>Max streak</small></div><div class="stat"><b>100%</b><small>Win %</small></div></div>
+      <div class="board" data-rows="aaacaa;cccccc"></div>
+      <button class="btn1 black wide" style="max-width:300px">Sign up to save your streak</button>
+      <button class="btn1 muted wide" style="max-width:300px">Share results</button>
+      <div class="grid3" style="max-width:300px"><div class="art-card1"><div class="im"></div><p>Article headline</p></div><div class="art-card1"><div class="im"></div><p>Article headline</p></div><div class="art-card1"><div class="im"></div><p>Article headline</p></div></div>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2 lead">
+      <img class="bird" src="birdle-logo.svg" alt="" style="width:30px;height:30px">
+      <div style="font:400 28px var(--font-birdle-headline)">Congratulations!</div>
+      <div class="stats"><div class="stat"><b>1</b><small>Streaks</small></div><div class="stat"><b>1</b><small>Max streak</small></div><div class="stat"><b>100%</b><small>Win %</small></div></div>
+      <div class="board" data-rows="aaacaa;cccccc"></div>
+      <button class="btn2 wide" style="max-width:300px">Sign up to save your streak</button>
+      <button class="btn2 wide" style="max-width:300px">Share results</button>
+      <div style="align-self:stretch;max-width:300px;margin:0 auto;width:100%;text-align:left;font:400 20px var(--font-birdle-headline)">Keep Birding</div>
+      <div class="grid3" style="max-width:300px"><div class="art-card"><div class="im"></div><p>Medium headline</p></div><div class="art-card"><div class="im"></div><p>Medium headline</p></div><div class="art-card"><div class="im"></div><p>Medium headline</p></div></div>
+    </div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Heading</td><td>Merriweather heavy</td><td><code>--font-birdle-headline</code> ~28px</td></tr>
+    <tr><td>Sign-up CTA</td><td><code>rounded-full bg-black</code> + <code>font-body text-utility2-size</code></td><td><code>--color-bg-muted</code> pill, label style, full width</td></tr>
+    <tr><td>Share results</td><td><code>bg-bg-muted hover:bg-bg-dark</code></td><td><code>--color-bg-muted</code> pill, label style, full width</td></tr>
+    <tr><td>Stat tiles</td><td><code>font-body</code> number + caption</td><td><code>linear-gradient(#fff,#ececec)</code>, number <code>--font-birdle-label</code> 400 ~18px, caption label style</td></tr>
+    <tr><td>Back to puzzle</td><td>n/a</td><td>Label style + <code>--color-bg-medium</code> round close button</td></tr>
+    <tr><td>Keep Birding cards</td><td>Article cards, Merriweather headlines</td><td>3-col grid, <code>1px solid #000</code>, ~8px radius, 3:2 image, <code>--font-birdle-utility</code> headline</td></tr>
+  </table>
+</section>
+
+<!-- 7 STATS -->
+<section class="screen" id="stats">
+  <h2>7 · Statistics</h2>
+  <p class="node">Figma <code>735:50353</code> (mobile) · <code>735:50317</code>. The v1 pane is approximate: it's built from the bundle's class strings because this screen wasn't opened live.</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1 lead">
+      <div style="font:900 20px var(--font-body)">Statistics</div>
+      <div class="stats"><div class="stat"><b>1</b><small>Played</small></div><div class="stat"><b>1</b><small>Streak</small></div><div class="stat"><b>100%</b><small>Win %</small></div></div>
+      <button class="btn1 black wide" style="max-width:300px">Sign up to save your streak</button>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2 lead">
+      <div style="font:400 28px var(--font-birdle-headline)">Statistics</div>
+      <div class="stats" style="max-width:320px"><div class="stat"><b>1</b><small>Streaks</small></div><div class="stat"><b>1</b><small>Max</small></div><div class="stat"><b>1</b><small>Played</small></div><div class="stat"><b>4</b><small>Avg.</small></div></div>
+      <div style="width:100%;max-width:320px;text-align:left;background:linear-gradient(#fff,#ececec);border-radius:4px;padding:6px"><span class="label" style="font-size:9px">Your birds</span> <span class="label" style="font-size:9px;float:right">(3-1)</span>
+        <div style="display:flex;gap:4px;margin-top:4px"><i style="flex:1;aspect-ratio:1;border-radius:4px;background:#b9c7a4"></i><i style="flex:1;aspect-ratio:1;border-radius:4px;background:#d9dde3"></i><i style="flex:1;aspect-ratio:1;border-radius:4px;background:#8e9c74"></i></div></div>
+      <button class="btn2 wide" style="max-width:320px">Sign up to save your streak</button>
+    </div></div>
+  </div>
+  <div class="flag"><b>Ships in this release. This is new functionality, not a reskin.</b> Avg. Guesses, the "Your birds" carousel with win/loss badges, and the Best/Worst Habitat cards all need new data (per-bird history, per-habitat win rates) and new components. Plan backend and API work alongside the reskin.</div>
+</section>
+
+<!-- 8 BIRD -->
+<section class="screen" id="bird">
+  <h2>8 · Bird detail page</h2>
+  <p class="node">Figma <code>735:47257</code> (desktop) · <code>735:48445</code> (mobile)</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1" style="align-items:flex-start">
+      <div style="font:400 10px var(--font-body);color:var(--color-text-secondary)">← Back to Birdle</div>
+      <div style="font:900 24px var(--font-body)">Bald Eagle</div>
+      <div style="font:italic 400 13px var(--font-body);color:var(--color-text-secondary)">Haliaeetus leucocephalus</div>
+      <div style="display:flex;gap:6px;width:100%"><span class="play1" style="flex:1"><i class="tri"></i>Play call</span><span class="play1" style="flex:1"><i class="tri"></i>Play sound</span></div>
+      <p style="font:400 12px/20px var(--font-body);margin:0;color:var(--color-text-primary)">The bald eagle is a bird of prey found in North America…</p>
+    </div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2" style="align-items:flex-start">
+      <div class="label" style="font-size:9px">← Back to Birdle</div>
+      <div style="font:400 28px var(--font-birdle-headline)">Bald Eagle</div>
+      <div style="font:italic 400 15px var(--font-birdle-headline);color:var(--color-text-secondary)">Haliaeetus leucocephalus</div>
+      <div style="display:flex;gap:6px;width:100%;border-top:1px solid #171717;padding-top:8px"><span class="play2"><i class="tri"></i>Play call</span><span class="play2"><i class="tri"></i>Play sound</span></div>
+      <p style="font:400 15px/24px var(--font-birdle-headline);margin:0;color:var(--color-text-primary)">The bald eagle is a bird of prey found in North America…</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="btn2" style="min-width:0;height:28px;font-size:9px">All about birds ↗</span><span class="btn2" style="min-width:0;height:28px;font-size:9px">Wikipedia ↗</span></div>
+    </div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Common name</td><td>Merriweather heavy</td><td><code>--font-birdle-headline</code> ~28px</td></tr>
+    <tr><td>Scientific name</td><td>Merriweather italic</td><td><code>--font-birdle-headline</code> italic ~16px, 1px #171717 rule below</td></tr>
+    <tr><td>Family / Order / Region</td><td>Merriweather</td><td>Label style for labels, <code>--font-birdle-utility</code> 12px for values</td></tr>
+    <tr><td>Play call / sound</td><td><code>rounded-small bg-bg-muted</code></td><td><code>--color-bg-muted</code>, <code>--radius-small</code></td></tr>
+    <tr><td>Body</td><td><code>--font-body</code> 16.5/28</td><td><code>--font-birdle-headline</code> ~16/26</td></tr>
+    <tr><td>Learn more</td><td>Outline or muted pills</td><td><code>--color-bg-muted</code> pills with label style + ↗</td></tr>
+    <tr><td>Range map / hero</td><td><code>rounded-large</code></td><td>No change (<code>--radius-large</code>). Credits in <code>--font-birdle-headline</code> italic</td></tr>
+  </table>
+</section>
+
+<!-- 9 HABITAT -->
+<section class="screen" id="habitat">
+  <h2>9 · Habitat cards</h2>
+  <p class="node">Figma <code>735:49956</code> (lower half). The v1 pane is approximate, based on the v1 Figma frame.</p>
+  <div class="compare">
+    <div class="pane"><div class="tag">v1 · live</div><div class="stage v1"><div style="display:flex;gap:8px">
+      <div class="hab" style="border:0"><div style="font:700 9px var(--font-body)">Habitat</div><div class="art" style="background:var(--color-bg-cream)">🌲</div><div style="font:700 11px var(--font-body)">Forest</div></div>
+      <div class="hab" style="border:0"><div style="font:700 9px var(--font-body)">Habitat</div><div class="art" style="background:var(--color-bg-cream)">🌊</div><div style="font:700 11px var(--font-body)">Marine</div></div>
+    </div></div></div>
+    <div class="pane"><div class="tag v2">v2 · Figma</div><div class="stage v2"><div style="display:flex;gap:8px">
+      <div class="hab"><div class="label" style="font-size:8px;line-height:1.2">Habitat</div><div class="art">🌲</div><div class="nm">Forest</div></div>
+      <div class="hab"><div class="label" style="font-size:8px;line-height:1.2">Habitat</div><div class="art">🌊</div><div class="nm">Marine</div></div>
+    </div></div></div>
+  </div>
+  <table>
+    <tr><th>Element</th><th>Live token / value</th><th>v2 token / value</th></tr>
+    <tr><td>Card</td><td><code>rounded-large bg-white</code> + shadow</td><td>Add <code>1px solid #000</code>, ~8px radius</td></tr>
+    <tr><td>Header</td><td><code>font-body</code> bold</td><td>Label style ~10px + grass icon</td></tr>
+    <tr><td>Name</td><td>Merriweather</td><td><code>--font-birdle-headline</code> ~14px</td></tr>
+    <tr><td>Set</td><td>—</td><td>11 habitats: Forest, Shrubland, Woodland, <b>Grassland</b>, Wetland, Marine, Rock, <b>Human Modified</b>, Coastal, Riverine, Desert. Grassland and Human Modified are new in the latest Figma.</td></tr>
+  </table>
+  <div class="flag">Copy typos in the design: "Costal" should be <b>Coastal</b> and "Dessert" should be <b>Desert</b>.</div>
+</section>
+
+<!-- ACCESSIBILITY -->
+<section class="screen" id="a11y">
+  <h2>Accessibility</h2>
+  <p class="note"> #171717 text passes WCAG AA on <code>#a8d03a</code>, <code>#f8c97c</code>, <code>#addcf5</code> and <code>#e6e6e6</code>, and is about 4.6:1 on Glimpse <code>#e24e40</code>. Correct (lime) and present (peach) now differ mostly by hue. Run a color-blind check and keep the state in each tile's and key's <code>aria-label</code>.</p>
+</section>
+</main>
+</div>
+
+<script>
+// Builds the board and keyboard mocks. Static demo data only; nothing here reads user input.
+(function () {
+  var MAP = { c: 'c', p: 'p', a: 'a' };
+  document.querySelectorAll('.board').forEach(function (b) {
+    var rows = b.dataset.rows.split(';');
+    var demoLetters = ['EAGLES', 'BALD  '];
+    rows.forEach(function (row, r) {
+      for (var i = 0; i < 6; i++) {
+        var ch = row[i], t = document.createElement('div');
+        t.className = 'tile';
+        if (MAP[ch]) { t.classList.add(MAP[ch]); t.textContent = (demoLetters[0][i] || ''); }
+        else if (ch === 's') { t.classList.add('a'); t.textContent = 'E'; }
+        else if (ch && ch !== '_') { t.classList.add('f', 'act'); t.textContent = ch; }
+        else if (ch === '_' && /[A-Z]/.test(row)) { t.classList.add('act'); } // empty tile in the row being typed
+        b.appendChild(t);
+      }
+    });
+  });
+  var ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  var STATE = { e: 'a', a: 'c', g: 'p', l: 'c', s: 'a', d: 'p', q: 'a' };
+  document.querySelectorAll('.kb').forEach(function (kb) {
+    var mode = kb.dataset.kb;
+    ROWS.forEach(function (letters, r) {
+      var row = document.createElement('div'); row.className = 'row';
+      if (r === 2) { var en = document.createElement('div'); en.className = 'key wide'; en.textContent = 'ENTER'; row.appendChild(en); }
+      letters.split('').forEach(function (l) {
+        var k = document.createElement('div'); k.className = 'key'; k.textContent = l;
+        if (mode === 'all-c') k.classList.add('c');
+        else if (mode === 'all-w') k.classList.add('w');
+        else if (mode === 'all-p') k.classList.add('p');
+        else if (STATE[l]) k.classList.add(STATE[l]);
+        row.appendChild(k);
+      });
+      if (r === 2) { var bs = document.createElement('div'); bs.className = 'key wide'; bs.textContent = '⌫'; bs.style.fontSize = '12px'; row.appendChild(bs); }
+      kb.appendChild(row);
+    });
+  });
+})();
+</script>
+</body>
+</html>
